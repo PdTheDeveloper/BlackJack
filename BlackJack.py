@@ -72,21 +72,6 @@ class Deck:
         self.cards[position-1].hide()
 
 
-
-def addMoney(amount):
-    global playerMoney
-    playerMoney+=amount
-
-def bust(deck):
-    global gamblerIsDone
-    if gamblerIsDone:
-        print("Dealer Busted!")
-        win()
-    else:
-        print("Gambler Busted!")
-        lose()
-
-
 #Globals
 playerMoney=0
 bet=0
@@ -104,9 +89,56 @@ dealerDeck=None
 gamblerDeck=None
 gamblerIsDone=False
 
+
+
+def addMoney(amount):
+    global playerMoney
+    playerMoney+=amount
+
+def bust(deck):
+    global gamblerIsDone
+    if gamblerIsDone:
+        print("Dealer Busted!")
+        win()
+    else:
+        print("Gambler Busted!")
+        lose()
+
+def playOrNot():
+    while True:
+        try:
+            choice = input("Do you wanna play again? Y for yes and N for no :")
+        except:
+            print("\nInvalid choice! Try again :\n")
+            continue
+        if choice=="Y" or choice=="N":
+            return choice
+            break
+        else:
+            print("\nInvalid choice! Try again :\n")
+
+
+def win():
+    global bet,playerMoney
+    playerMoney+=bet
+    print(f"\nYou won {bet}$ and now you have {playerMoney}$\n")
+    choice=playOrNot()
+    if choice=="Y":
+        init()
+
+def lose():
+    global bet,playerMoney
+    playerMoney-=bet
+    print(f"\nYou lost {bet}$ and now you have {playerMoney}$\n")
+    choice=playOrNot()
+    if choice=="Y":
+        init()
+
+
 def stay():
     global gamblerIsDone
     gamblerIsDone=True
+
 
 def hit():
     global gamblerDeck,dealerDeck,gamblerIsDone
@@ -116,16 +148,24 @@ def hit():
             gamblerDeck.aceMove()
         if gamblerDeck.sum()>21:
             bust(gamblerDeck)
+            gamblerIsDone=True
         else:
             updateTable(dealerDeck,gamblerDeck)
     else:
-        fullDeck.draw(dealerDeck)
-        if dealerDeck.sum() > 21:
-            dealerDeck.aceMove()
-        if dealerDeck.sum() > 21:
-            bust(dealerDeck)
+        if dealerDeck.sum()>gamblerDeck.sum():
+            lose()
         else:
-            updateTable(dealerDeck, gamblerDeck)
+            fullDeck.draw(dealerDeck)
+            if dealerDeck.sum() > 21:
+                dealerDeck.aceMove()
+            if dealerDeck.sum() > 21:
+                bust(dealerDeck)
+            else:
+                updateTable(dealerDeck, gamblerDeck)
+            if dealerDeck.sum()>gamblerDeck.sum():
+                lose()
+            else:
+                hit()
 
 
 
@@ -137,7 +177,8 @@ def resetCards():
     fullDeck=Deck(fullCards)
 
 def init():
-    global dealerDeck,gamblerDeck,fullDeck,playerMoney,bet
+    global dealerDeck,gamblerDeck,fullDeck,playerMoney,bet,gamblerIsDone
+    gamblerIsDone = False
     print(35*"\n")
     while True:
         try:
@@ -184,3 +225,5 @@ def updateTable(dealerDeckP,gamblerDeckP):
                 print("\nInvalid choice! Try again:")
                 continue
 
+
+init()
