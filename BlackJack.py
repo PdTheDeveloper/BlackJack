@@ -81,7 +81,7 @@ types=["Heart","Diamond","Club","Spade"]
 
 fullDeck=None
 fullCards=[]
-for i in nums.items():
+for i in nums:
     for t in types:
         fullCards.append(Card(t, i))
 
@@ -136,8 +136,14 @@ def lose():
 
 
 def stay():
-    global gamblerIsDone
+    global gamblerIsDone,gamblerDeck,dealerDeck
     gamblerIsDone=True
+    dealerDeck.showCard(2)
+    if dealerDeck.sum()>gamblerDeck.sum():
+        updateTable()
+        win()
+    else:
+        hit()
 
 
 def hit():
@@ -150,7 +156,7 @@ def hit():
             bust(gamblerDeck)
             gamblerIsDone=True
         else:
-            updateTable(dealerDeck,gamblerDeck)
+            updateTable()
     else:
         if dealerDeck.sum()>gamblerDeck.sum():
             lose()
@@ -161,7 +167,7 @@ def hit():
             if dealerDeck.sum() > 21:
                 bust(dealerDeck)
             else:
-                updateTable(dealerDeck, gamblerDeck)
+                updateTable()
             if dealerDeck.sum()>gamblerDeck.sum():
                 lose()
             else:
@@ -194,14 +200,17 @@ def init():
     resetCards()
     dealerDeck = None
     gamblerDeck = None
+    dealerDeck=Deck([])
+    gamblerDeck = Deck([])
     for x in range(2):
         fullDeck.draw(dealerDeck)
         fullDeck.draw(gamblerDeck)
     dealerDeck.hideCard(2)
+    updateTable()
 
 
 
-def updateTable(dealerDeckP,gamblerDeckP):
+def updateTable():
     global gamblerDeck,dealerDeck,gamblerIsDone
     print(35*"\n")
     print("You :\n\n")
