@@ -47,7 +47,7 @@ class Deck:
 
     def show(self):
         for x in range(len(self.cards)):
-            print(f"{x+1}. {self.cards[x]}\n")
+            print(f"{x+1}. {self.cards[x]}")
 
     def aceMove(self):
         while self.aces()>self.acesDone and self.sum>21:
@@ -61,10 +61,6 @@ class Deck:
                 a+=1
         return a
 
-
-    def sum(self):
-        return self.sum
-
     def showCard(self,position):
         self.cards[position-1].show()
 
@@ -73,8 +69,10 @@ class Deck:
 
 
 #Globals
-playerMoney=0
+playerMoney=500
 bet=0
+dealerIsBusted=False
+gamblerIsBusted=False
 
 nums={"Ace":11,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,"Jack":10,"Queen":10,"King":10}
 types=["Heart","Diamond","Club","Spade"]
@@ -96,12 +94,12 @@ def addMoney(amount):
     playerMoney+=amount
 
 def bust(deck):
-    global gamblerIsDone
+    global gamblerIsDone,gamblerIsBusted,dealerIsBusted
     if gamblerIsDone:
-        print("Dealer Busted!")
+        dealerIsBusted=True
         win()
     else:
-        print("Gambler Busted!")
+        gamblerIsBusted=True
         lose()
 
 def playOrNot():
@@ -121,25 +119,36 @@ def playOrNot():
 def win():
     global bet,playerMoney
     playerMoney+=bet
+    updateTable()
+    if dealerIsBusted:
+        print("\nDealer is Busted!")
     print(f"\nYou won {bet}$ and now you have {playerMoney}$\n")
     choice=playOrNot()
     if choice=="Y":
         init()
+    else:
+        exit()
 
 def lose():
-    global bet,playerMoney
+    global bet,playerMoney,gamblerIsDone
     playerMoney-=bet
+    gamblerIsDone=True
+    updateTable()
+    if gamblerIsBusted:
+        print("\nGambler is Busted!")
     print(f"\nYou lost {bet}$ and now you have {playerMoney}$\n")
     choice=playOrNot()
     if choice=="Y":
         init()
+    else:
+        exit()
 
 
 def stay():
     global gamblerIsDone,gamblerDeck,dealerDeck
     gamblerIsDone=True
     dealerDeck.showCard(2)
-    if dealerDeck.sum()>gamblerDeck.sum():
+    if dealerDeck.sum>gamblerDeck.sum:
         updateTable()
         win()
     else:
@@ -150,25 +159,25 @@ def hit():
     global gamblerDeck,dealerDeck,gamblerIsDone
     if not gamblerIsDone:
         fullDeck.draw(gamblerDeck)
-        if gamblerDeck.sum()>21:
+        if gamblerDeck.sum>21:
             gamblerDeck.aceMove()
-        if gamblerDeck.sum()>21:
+        if gamblerDeck.sum>21:
             bust(gamblerDeck)
             gamblerIsDone=True
         else:
             updateTable()
     else:
-        if dealerDeck.sum()>gamblerDeck.sum():
+        if dealerDeck.sum>gamblerDeck.sum:
             lose()
         else:
             fullDeck.draw(dealerDeck)
-            if dealerDeck.sum() > 21:
+            if dealerDeck.sum > 21:
                 dealerDeck.aceMove()
-            if dealerDeck.sum() > 21:
+            if dealerDeck.sum > 21:
                 bust(dealerDeck)
             else:
                 updateTable()
-            if dealerDeck.sum()>gamblerDeck.sum():
+            if dealerDeck.sum>gamblerDeck.sum:
                 lose()
             else:
                 hit()
@@ -183,20 +192,22 @@ def resetCards():
     fullDeck=Deck(fullCards)
 
 def init():
-    global dealerDeck,gamblerDeck,fullDeck,playerMoney,bet,gamblerIsDone
+    global dealerDeck,gamblerDeck,fullDeck,playerMoney,bet,gamblerIsDone,gamblerIsBusted,dealerIsBusted
+    gamblerIsBusted=False
+    dealerIsBusted=False
     gamblerIsDone = False
     print(35*"\n")
     while True:
         try:
-            bet=int(input("How much do you wanna gamble?\n"))
+            bet=int(input(f"How much do you wanna gamble? (You have {playerMoney}$)\n"))
         except:
             print("\nInvalid bet! Try again :\n")
             continue
-        if bet>playerMoney:
-            playerMoney-=bet
+        if bet<=playerMoney:
             break
         else:
             print("\nNot enough money! Try again :\n")
+            continue
     resetCards()
     dealerDeck = None
     gamblerDeck = None
@@ -215,21 +226,22 @@ def updateTable():
     print(35*"\n")
     print("You :\n\n")
     gamblerDeck.show()
-    print("\n-----------------------------------------------------\n\nDealer:\n\n")
+    print("\n-----------------------------------------------------\n\nDealer:\n")
     dealerDeck.show()
     if not gamblerIsDone:
         while True:
             try:
-                choice=int(input("\nDo you wanna hit or stay? 1 for hit and 2 for stay"))
+                choice=int(input("\nDo you wanna hit or stay? 1 for hit and 2 for stay\n"))
             except:
                 print("\nInvalid choice! Try again:")
                 continue
             if choice==1 or choice==2:
                 if choice==1:
                     hit()
+                    break
                 else:
                     stay()
-                break
+                    break
             else:
                 print("\nInvalid choice! Try again:")
                 continue
