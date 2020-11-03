@@ -150,7 +150,7 @@ def stay():
     dealerDeck.showCard(2)
     if dealerDeck.sum>gamblerDeck.sum:
         updateTable()
-        win()
+        lose()
     else:
         hit()
 
@@ -186,8 +186,11 @@ def hit():
 
 
 def resetCards():
-    global fullCards,fullDeck
-    random.shuffle(fullCards)
+    global fullCards,fullDeck,nums,types
+    fullCards = []
+    for i in nums:
+        for t in types:
+            fullCards.append(Card(t, i))
     fullDeck=None
     fullDeck=Deck(fullCards)
 
@@ -222,7 +225,7 @@ def init():
 
 
 def updateTable():
-    global gamblerDeck,dealerDeck,gamblerIsDone
+    global gamblerDeck,dealerDeck,gamblerIsDone,fullDeck
     print(35*"\n")
     print("You :\n\n")
     gamblerDeck.show()
