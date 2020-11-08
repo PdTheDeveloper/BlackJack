@@ -25,7 +25,7 @@ class Card:
 
 
 class Deck:
-    def __init__(self,cards):
+    def __init__(self,cards=[]):
         self.count=len(cards)
         self.cards=cards
         self.sum=0
@@ -133,6 +133,7 @@ def lose():
     global bet,playerMoney,gamblerIsDone
     playerMoney-=bet
     gamblerIsDone=True
+    dealerDeck.showCard(2)
     updateTable()
     if gamblerIsBusted:
         print("\nGambler is Busted!")
